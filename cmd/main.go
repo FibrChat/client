@@ -12,8 +12,23 @@ import (
 
 	"github.com/fibrchat/client/pkg/client"
 	"github.com/fibrchat/worker/pkg/address"
+	"github.com/fibrchat/worker/pkg/event"
 	"github.com/fibrchat/worker/pkg/message"
 )
+
+type handler struct{}
+
+func (h handler) OnMessage(msg message.Message) {
+	fmt.Printf("\r\033[K[%s] %s: %s\n> ", msg.Timestamp.Format("15:04:05"), msg.Src, msg.Content)
+}
+
+func (h handler) OnConnect(evt event.Event) {
+	fmt.Printf("\r\033[K* %s connected\n> ", evt.User)
+}
+
+func (h handler) OnDisconnect(evt event.Event) {
+	fmt.Printf("\r\033[K* %s disconnected\n> ", evt.User)
+}
 
 // Temp CLI client
 func main() {
@@ -34,9 +49,7 @@ func main() {
 		Username:  *username,
 		Password:  *password,
 		Domain:    *domain,
-		OnMessage: func(msg message.Message) {
-			fmt.Printf("\r\033[K[%s] %s: %s\n> ", msg.Timestamp.Format("15:04:05"), msg.From, msg.Body)
-		},
+		Handler:   handler{},
 	})
 	if err != nil {
 		log.Fatalf("Failed to connect: %v", err)
@@ -78,12 +91,13 @@ func main() {
 		}
 
 		to, body := parts[0], parts[1]
-		if _, _, err := address.Split(to); err != nil {
+		dst, err := address.Parse(to)
+		if err != nil {
 			fmt.Printf("  Invalid address: %v\n", err)
 			continue
 		}
 
-		resp, err := c.SendMessage(to, body)
+		resp, err := c.SendMessage(dst, body)
 		if err != nil {
 			fmt.Printf("  Error: %v\n", err)
 			continue

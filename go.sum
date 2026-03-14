@@ -1,7 +1,11 @@
 github.com/fibrchat/server v0.0.0-20260311075846-87f457f12bcb h1:q3BKU+wpHTUwJe79MPn7CTHnVpeK8mJAj4hUsUj8FiE=
 github.com/fibrchat/server v0.0.0-20260311075846-87f457f12bcb/go.mod h1:qvgD1BxJy4V7CKvudO8WbBktRBe5aXuzdaqz02DGRjQ=
+github.com/fibrchat/server v0.0.0-20260314073510-562d9cfd77ad h1:Sdz0D9tdMIAlIA1wg4x+GzRn9JlrRGUAZFnVk/Paj0k=
+github.com/fibrchat/server v0.0.0-20260314073510-562d9cfd77ad/go.mod h1:qvgD1BxJy4V7CKvudO8WbBktRBe5aXuzdaqz02DGRjQ=
 github.com/fibrchat/worker v0.0.0-20260311081108-4f5f75d74cce h1:qx350kxfokHl49DRAJp/tZxLm5wJLsX76XrxOO5qDlY=
 github.com/fibrchat/worker v0.0.0-20260311081108-4f5f75d74cce/go.mod h1:jLgRosADinr2GHmAzrQewdilZX+5x8MYsF0olFtFz5I=
+github.com/fibrchat/worker v0.0.0-20260314073818-e8e5a55b8c16 h1:WOL2nrgy5fiTG6vhJ5/j5O+Hunb5Z4FSjapG+BE88d8=
+github.com/fibrchat/worker v0.0.0-20260314073818-e8e5a55b8c16/go.mod h1:jLjOI4YeordRSF5wCAFCXqnMj2cjY6T9TXWfzPDZTIo=
 github.com/klauspost/compress v1.18.4 h1:RPhnKRAQ4Fh8zU2FY/6ZFDwTVTxgJ/EMydqSTzE9a2c=
 github.com/klauspost/compress v1.18.4/go.mod h1:R0h/fSBs8DE4ENlcrlib3PsXS61voFxhIs2DeRhCvJ4=
 github.com/nats-io/nats.go v1.49.0 h1:yh/WvY59gXqYpgl33ZI+XoVPKyut/IcEaqtsiuTJpoE=

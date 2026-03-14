@@ -7,18 +7,20 @@ import (
 	"time"
 
 	"github.com/fibrchat/server/pkg/subject"
+	"github.com/fibrchat/worker/pkg/address"
+	"github.com/fibrchat/worker/pkg/event"
 
 	"github.com/fibrchat/worker/pkg/message"
 
 	"github.com/nats-io/nats.go"
 )
 
-// HandleSend handles sending a message to the specified recipient.
-func (c *Client) SendMessage(to, body string) (*message.Response, error) {
+// SendMessage handles sending a message to the specified recipient.
+func (c *Client) SendMessage(dst address.Address, body string) (*message.Response, error) {
 	msg := message.Message{
-		From:      c.Address(),
-		To:        to,
-		Body:      body,
+		Src:       c.addr,
+		Dst:       dst,
+		Content:   body,
 		Timestamp: time.Now().UTC(),
 	}
 
@@ -27,7 +29,7 @@ func (c *Client) SendMessage(to, body string) (*message.Response, error) {
 		return nil, fmt.Errorf("marshal: %w", err)
 	}
 
-	reply, err := c.nc.Request(subject.Send, data, 5*time.Second)
+	reply, err := c.nc.Request(subject.PublishSubject, data, 5*time.Second)
 	if err != nil {
 		return nil, fmt.Errorf("send: %w", err)
 	}
@@ -40,16 +42,28 @@ func (c *Client) SendMessage(to, body string) (*message.Response, error) {
 	return &resp, nil
 }
 
-// handleIncoming handles incoming messages....
-func (c *Client) HandleIncoming(msg *nats.Msg) {
-	if c.onMsg == nil {
-		return
-	}
-
+// handleIncoming processes incoming messages and dispatches them to the event handler.
+func (c *Client) handleIncoming(msg *nats.Msg) {
 	var cm message.Message
 	if err := json.Unmarshal(msg.Data, &cm); err != nil {
 		return
 	}
 
-	c.onMsg(cm)
+	c.handler.OnMessage(cm)
+}
+
+// handlePresence processes presence events (connect/disconnect) and dispatches them to the event handler.
+func (c *Client) handlePresence(msg *nats.Msg) {
+	var evt event.Event
+	if err := json.Unmarshal(msg.Data, &evt); err != nil {
+		return
+	}
+
+	switch evt.Type {
+	case event.Connect:
+		c.handler.OnConnect(evt)
+
+	case event.Disconnect:
+		c.handler.OnDisconnect(evt)
+	}
 }
