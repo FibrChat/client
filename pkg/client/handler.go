@@ -11,12 +11,13 @@ import (
 	"github.com/fibrchat/worker/pkg/event"
 
 	"github.com/fibrchat/worker/pkg/message"
+	"github.com/fibrchat/worker/pkg/request"
 
 	"github.com/nats-io/nats.go"
 )
 
 // SendMessage handles sending a message to the specified recipient.
-func (c *Client) SendMessage(dst address.Address, body string) (*message.Response, error) {
+func (c *Client) SendMessage(dst address.Address, body string) (*request.Response, error) {
 	msg := message.Message{
 		Src:       c.addr,
 		Dst:       dst,
@@ -34,12 +35,27 @@ func (c *Client) SendMessage(dst address.Address, body string) (*message.Respons
 		return nil, fmt.Errorf("send: %w", err)
 	}
 
-	var resp message.Response
+	var resp request.Response
 	if err := json.Unmarshal(reply.Data, &resp); err != nil {
 		return nil, fmt.Errorf("decode response: %w", err)
 	}
 
 	return &resp, nil
+}
+
+// ListOnline returns the list of currently online users.
+func (c *Client) ListOnline() ([]string, error) {
+	reply, err := c.nc.Request(subject.UsersSubject, nil, 5*time.Second)
+	if err != nil {
+		return nil, fmt.Errorf("request users: %w", err)
+	}
+
+	var resp request.UsersResponse
+	if err := json.Unmarshal(reply.Data, &resp); err != nil {
+		return nil, fmt.Errorf("decode users: %w", err)
+	}
+
+	return resp.Users, nil
 }
 
 // handleIncoming processes incoming messages and dispatches them to the event handler.
